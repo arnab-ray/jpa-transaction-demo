@@ -1,0 +1,48 @@
+server:
+  port: 8085
+  undertow:
+    threads:
+      worker: 64
+      io: 8
+
+spring:
+  application:
+    name: jpa-transaction-demo
+  profiles:
+    active: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/tx_demo?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password:
+  jpa:
+    database: MYSQL
+    show_sql: false
+    generate-ddl: false
+    open-in-view: false
+    hibernate:
+      naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+      generate_statistics: true
+      format_sql: true
+    properties:
+      hibernate.cache.user_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      org.hibernate.envers.audit_table_suffix: _history
+      hibernate.jdbc.time_zone: Asia/Kolkata
+      hibernate.jdbc.batch_size: 100
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      transaction-id-prefix: "tx-"
+      acks: all
+      properties:
+        enable.idempotence: true
+
+    consumer:
+      enable-auto-commit: false
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        isolation.level: read_committed
